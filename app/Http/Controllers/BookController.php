@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
+use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -11,7 +13,8 @@ class BookController extends Controller
      */
     public function index()
     {
-        //
+        $books = Book::latest()->get();
+        return view('books.index', compact('books'));
     }
 
     /**
@@ -19,7 +22,7 @@ class BookController extends Controller
      */
     public function create()
     {
-        //
+        return view('books.create');
     }
 
     /**
@@ -27,7 +30,15 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validation = $request->validate([
+            'title' => 'required|string',
+            'author' => 'required|string',
+            'caregory' => 'nullable|string',
+        ]);
+
+
+        Book::create($validation);
+        return redirect()->route('book.index')->with('success', 'livre ajouter avec un succées');
     }
 
     /**
@@ -41,24 +52,32 @@ class BookController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Book $book)
     {
-        //
+        return view('books.edit', compact('book'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Book $book)
     {
-        //
+        $validation = $request->validate([
+            'title' => 'required|string',
+            'author' => 'required|string',
+            'category' => 'nullable|string',
+    
+        ]);
+        $book->update($validation);
+        return redirect()->route('book.index')->with('success', 'le livre a est modiffier avec un succées');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Book $book)
     {
-        //
+        $book->delete();
+        return redirect()->route('books.index')->with('success', 'liver a est supprimer');
     }
 }
